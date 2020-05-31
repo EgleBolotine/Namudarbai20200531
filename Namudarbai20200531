@@ -1,0 +1,74 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using NUnit.Framework;
+using NUnit.Framework.Internal;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+
+namespace Namudarbai20200531
+{
+    public class Class1
+    {
+        private static IWebDriver _driver;
+
+        [OneTimeSetUp]
+        public static void NamuDarbaiChrome()
+        {
+            _driver = new ChromeDriver();
+            _driver.Url = "https://www.seleniumeasy.com/test/basic-checkbox-demo.html";
+            _driver.Manage().Window.Maximize();
+            _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+        }
+
+        [Order(1)]
+        [TestCase(TestName = "Check box")]
+        public static void PatikrintiZinutePazymejus()
+        {
+            var element = _driver.FindElement(By.Id("isAgeSelected"));
+            element.Click();
+
+            var pranesimas = _driver.FindElement(By.Id("txtAge"));
+            Assert.AreEqual("Success - Check box is checked", pranesimas.Text, "Pranesimas neteisingas");
+            element.Click(); //un-click, kad veiktu tolimesnis testas
+        }
+
+
+        [Order(2)]
+        [TestCase(TestName = "Tick all and check button name")]
+
+        public static void TickAll()
+        {
+            var elements = _driver.FindElements(By.ClassName("cb1-element"));
+            foreach (var element in elements)
+            {
+                element.Click();
+            }
+
+            var buttonName = _driver.FindElement(By.Id("check1")).GetAttribute("value"); //GetAttribute?? - nesupratau sitos dalies
+            Assert.AreEqual("Uncheck All", buttonName, "Tekstas neatitinka");
+        }
+
+        [Order(3)]
+        [TestCase(TestName = "Click 'Uncheck all' button")]
+
+        public static void ClickUncheckButton()
+        {
+            _driver.FindElement(By.Id("check1")).Click();
+            var elements = _driver.FindElements(By.XPath("//*[@id='check1']"));
+            foreach (var element in elements)
+            {
+                Assert.AreEqual(false, element.Selected, "At lease one box is still ticked"); //FALSE dalies nesupratau
+            }
+
+        }
+
+        [OneTimeTearDown]
+        public static void UzdarytiNarsykle()
+        {
+            _driver.Quit();
+        }
+    }
+}
